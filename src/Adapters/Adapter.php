@@ -435,4 +435,18 @@ abstract class Adapter
     {
         return Utils::getFirstValue(Utils::getData($this->providers, 'publishedTime'));
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function toArray()
+    {
+        $return = [];
+        foreach(get_class_methods($this) AS $method) {
+            if(preg_match('~^get[A-Z]~', $method) && !in_array($method, ['getProvider'])) {
+                $return[strtolower(substr($method,3,1)) . substr($method, 4)] = $this->$method();
+            }
+        }
+        return $return;
+    }
 }
