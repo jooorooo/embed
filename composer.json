@@ -14,14 +14,9 @@
         }
     ],
     "require": {
-        "php": ">=5.4.0",
-        "ext-curl": "*"
-    },
-    "require-dev": {
-        "guzzlehttp/guzzle": "6.x"
-    },
-    "suggest": {
-        "guzzlehttp/guzzle@6.x": "To use Guzzle6 request resolver"
+        "php": ">=5.5.9",
+        "ext-curl": "*",
+        "guzzlehttp/guzzle": "~5.3|~6.0.1|~6.1"
     },
     "autoload": {
         "psr-4": {
