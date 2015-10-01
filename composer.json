@@ -18,7 +18,6 @@
         "ext-curl": "*"
     },
     "require-dev": {
-        "phpunit/phpunit": "~4.0",
         "guzzlehttp/guzzle": "6.x"
     },
     "suggest": {
