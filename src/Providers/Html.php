@@ -109,7 +109,11 @@ class Html extends Provider implements ProviderInterface
     public function getImagesUrls()
     {
         $images = (array) $this->bag->get('images');
-
+        $images = array_map(function($image) {
+            if(!array_key_exists('alt', $image))
+                $image['alt'] = '';
+            return $image;
+        }, $images);
         if ($this->config['maxImages'] > -1) {
             return array_slice($images, 0, $this->config['maxImages']);
         }
@@ -261,7 +265,7 @@ class Html extends Provider implements ProviderInterface
 
                 //Is src relative?
                 if (!$src->getDomain()) {
-                    $bag->add('images', $src->getUrl());
+                    $bag->add('images', ['url' => $src->getUrl(), 'alt' => $img->hasAttribute('alt') ? $img->getAttribute('alt') : '', 'href' => self::extractA($img)]);
                     continue;
                 }
 
@@ -276,7 +280,14 @@ class Html extends Provider implements ProviderInterface
                     while ($parent && isset($parent->tagName)) {
                         if ($parent->tagName === 'a') {
                             if ($parent->hasAttribute('href')) {
-                                $href = new Url($parent->getAttribute('href'));
+                                $ahref = $parent->getAttribute('href');
+                                $href = new Url($ahref);
+
+                                //slow, very slow
+//                                if(in_array(strtolower(pathinfo($ahref, PATHINFO_EXTENSION)), ['jpg', 'jpeg', 'png', 'gif'])) {
+//                                    $src = new Url($ahref);
+//                                    continue;
+//                                }
 
                                 if ($href->getDomain() && $src->getDomain() !== $domain) {
                                     continue 2;
@@ -292,10 +303,32 @@ class Html extends Provider implements ProviderInterface
                         $parent = $parent->parentNode;
                     }
 
-                    $bag->add('images', $src->getUrl());
+                    $bag->add('images', ['url' => $src->getUrl(), 'alt' => $img->hasAttribute('alt') ? $img->getAttribute('alt') : '', 'href' => self::extractA($img)]);
                 }
             }
         }
+    }
+
+    /**
+     * Extract <a> element for <img>
+     *
+     * @param \DOMElement $html
+     * @param Bag         $bag
+     * @param null|string $domain
+     */
+    protected static function extractA(\DOMElement $img)
+    {
+        $parent = $img->parentNode;
+        while ($parent && isset($parent->tagName)) {
+            if ($parent->tagName === 'a') {
+                if ($parent->hasAttribute('href')) {
+                    return $parent->getAttribute('href');
+                }
+            }
+
+            $parent = $parent->parentNode;
+        }
+        return null;
     }
 
     /**

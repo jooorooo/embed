@@ -78,16 +78,33 @@ class Utils
 
             foreach ($value as $v) {
                 if ($url) {
-                    $v = $url->getAbsolute($v);
+                    if(is_array($v) && array_key_exists('url', $v)) {
+                        $v['url'] = $url->getAbsolute($v['url']);
+                    } else {
+                        $v = $url->getAbsolute($v);
+                    }
                 }
 
-                if (!isset($values[$v])) {
-                    $values[$v] = [
-                        'value' => $v,
-                        'providers' => [$key],
-                    ];
-                } elseif (!in_array($key, $values[$v]['providers'], true)) {
-                    $values[$v]['providers'][] = $key;
+                if(is_array($v) && array_key_exists('url', $v)) {
+                    if (!isset($values[$v['url']])) {
+                        $values[$v['url']] = [
+                            'value' => $v['url'],
+                            'alt' => $v['alt'],
+                            'href' => $v['href'],
+                            'providers' => [$key],
+                        ];
+                    } elseif (!in_array($key, $values[$v['url']]['providers'], true)) {
+                        $values[$v['url']]['providers'][] = $key;
+                    }
+                } else {
+                    if (!isset($values[$v])) {
+                        $values[$v] = [
+                            'value' => $v,
+                            'providers' => [$key],
+                        ];
+                    } elseif (!in_array($key, $values[$v]['providers'], true)) {
+                        $values[$v]['providers'][] = $key;
+                    }
                 }
             }
         }
