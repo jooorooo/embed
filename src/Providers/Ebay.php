@@ -59,7 +59,7 @@ class Ebay extends Html
 
             //Is src relative?
             if (!$src->getDomain()) {
-                $bag->add('images', ['url' => $src->getUrl(), 'alt' => self::_getAltTag($img), 'href' => self::extractA($img)]);
+                $bag->add('images', ['url' => $src->getUrl(), 'alt' => self::_getAltTag($img), 'href' => self::extractA($img, $bag->get('request_url'))]);
                 return;
             }
 
@@ -69,7 +69,7 @@ class Ebay extends Html
                     return;
                 }
 
-                $bag->add('images', ['url' => $src->getUrl(), 'alt' => self::_getAltTag($img), 'href' => self::extractA($img)]);
+                $bag->add('images', ['url' => $src->getUrl(), 'alt' => self::_getAltTag($img), 'href' => self::extractA($img, $bag->get('request_url'))]);
             }
         }
     }

@@ -265,7 +265,7 @@ class Html extends Provider implements ProviderInterface
 
                 //Is src relative?
                 if (!$src->getDomain()) {
-                    $bag->add('images', ['url' => $src->getUrl(), 'alt' => $img->hasAttribute('alt') ? $img->getAttribute('alt') : '', 'href' => self::extractA($img)]);
+                    $bag->add('images', ['url' => $src->getUrl(), 'alt' => $img->hasAttribute('alt') ? $img->getAttribute('alt') : '', 'href' => self::extractA($img, $bag->get('request_url'))]);
                     continue;
                 }
 
@@ -303,7 +303,7 @@ class Html extends Provider implements ProviderInterface
                         $parent = $parent->parentNode;
                     }
 
-                    $bag->add('images', ['url' => $src->getUrl(), 'alt' => $img->hasAttribute('alt') ? $img->getAttribute('alt') : '', 'href' => self::extractA($img)]);
+                    $bag->add('images', ['url' => $src->getUrl(), 'alt' => $img->hasAttribute('alt') ? $img->getAttribute('alt') : '', 'href' => self::extractA($img, $bag->get('request_url'))]);
                 }
             }
         }
@@ -316,13 +316,13 @@ class Html extends Provider implements ProviderInterface
      * @param Bag         $bag
      * @param null|string $domain
      */
-    protected static function extractA(\DOMElement $img)
+    protected static function extractA(\DOMElement $img, $domain = null)
     {
         $parent = $img->parentNode;
         while ($parent && isset($parent->tagName)) {
             if ($parent->tagName === 'a') {
                 if ($parent->hasAttribute('href')) {
-                    return $parent->getAttribute('href');
+                    return self::_resolveFullPath($parent->getAttribute('href'), $domain);
                 }
             }
 
